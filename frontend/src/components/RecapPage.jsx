@@ -28,70 +28,97 @@ const RecapPage = () => {
         if (!recapRef.current) return;
 
         try {
-            // Generate canvas
+            // Show loading state
+            const originalText = document.querySelector('[data-download-btn]')?.textContent;
+            const btn = document.querySelector('[data-download-btn]');
+            if (btn) btn.textContent = 'Generating...';
+
+            // Generate canvas with higher quality settings
             const canvas = await html2canvas(recapRef.current, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
-                backgroundColor: null,
+                backgroundColor: '#1a1a2e',
                 allowTaint: false,
-                logging: false
+                logging: false,
+                imageTimeout: 0,
+                removeContainer: true
             });
 
-            const fileName = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
-            const dataUrl = canvas.toDataURL('image/png');
-
-            // Check if we're on mobile
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const dataUrl = canvas.toDataURL('image/png', 1.0);
+            const isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
             if (isMobile) {
-                // Try Web Share API with file (best for mobile)
-                try {
-                    const response = await fetch(dataUrl);
-                    const blob = await response.blob();
-                    const file = new File([blob], fileName, { type: 'image/png' });
-
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: 'My Tech Wrapped 2025'
-                        });
-                        return;
-                    }
-                } catch (shareErr) {
-                    console.log('Share with file failed:', shareErr);
-                }
-
-                // Fallback: Open image in new tab (user can long-press to save)
-                const newWindow = window.open();
-                if (newWindow) {
-                    newWindow.document.write(`
+                // MOBILE: Open image in new tab - most reliable method
+                // Create a full-screen image viewer
+                const imageWindow = window.open('', '_blank');
+                if (imageWindow) {
+                    imageWindow.document.write(`
+                        <!DOCTYPE html>
                         <html>
-                        <head><title>Your Tech Wrapped 2025</title></head>
-                        <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#1a1a2e;">
-                            <div style="text-align:center; padding:20px;">
-                                <p style="color:white; font-family:sans-serif; margin-bottom:20px;">Long-press the image to save it 📱</p>
-                                <img src="${dataUrl}" style="max-width:100%; height:auto; border-radius:16px;" />
+                        <head>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Save Your Tech Wrapped</title>
+                            <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body { 
+                                    min-height: 100vh; 
+                                    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                                    display: flex; 
+                                    flex-direction: column;
+                                    align-items: center; 
+                                    justify-content: center;
+                                    padding: 20px;
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                }
+                                .instructions {
+                                    color: white;
+                                    text-align: center;
+                                    margin-bottom: 20px;
+                                    padding: 15px 25px;
+                                    background: rgba(255,255,255,0.1);
+                                    border-radius: 12px;
+                                    backdrop-filter: blur(10px);
+                                }
+                                .instructions h2 { font-size: 18px; margin-bottom: 8px; }
+                                .instructions p { font-size: 14px; opacity: 0.9; }
+                                img { 
+                                    max-width: 100%; 
+                                    height: auto; 
+                                    border-radius: 16px;
+                                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="instructions">
+                                <h2>📱 Save Your Image</h2>
+                                <p><strong>Tap and hold</strong> the image below, then select <strong>"Save Image"</strong></p>
                             </div>
+                            <img src="${dataUrl}" alt="Tech Wrapped 2025" />
                         </body>
                         </html>
                     `);
-                    newWindow.document.close();
-                    return;
+                    imageWindow.document.close();
+                } else {
+                    // Popup blocked - show alert with instructions
+                    alert('Please allow popups, then try again. Or take a screenshot!');
                 }
+            } else {
+                // DESKTOP: Direct download
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
 
-            // Desktop: Direct download
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = fileName;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Restore button text
+            if (btn) btn.textContent = originalText;
 
         } catch (err) {
             console.error("Export failed:", err);
-            alert("Download failed. Please try taking a screenshot!");
+            alert("Couldn't generate image. Please take a screenshot instead!");
         }
     };
 
