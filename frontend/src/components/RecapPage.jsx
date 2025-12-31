@@ -202,12 +202,12 @@ const RecapPage = () => {
                         <div className="flex-1 flex flex-col gap-3">
                             {/* Row 1: Two cards side by side */}
                             <div className="grid grid-cols-2 gap-3">
-                                <GirlyCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="list" />
-                                <GirlyCard icon="💻" title="Projects Built" items={userData.projects} type="list" />
+                                <GirlyCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
+                                <GirlyCard icon="💻" title="Projects Built" items={userData.projects} type="text" />
                             </div>
 
                             {/* Row 2: Full width card */}
-                            <GirlyCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="list" size="full" />
+                            <GirlyCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" size="full" />
 
                             {/* Row 3: Tech Stack - Full width gradient banner */}
                             {userData.tools_learned?.length > 0 && (
@@ -290,12 +290,12 @@ const RecapPage = () => {
                         <div className="flex-1 flex flex-col gap-3">
                             {/* Row 1: Two cards side by side */}
                             <div className="grid grid-cols-2 gap-3">
-                                <NeutralCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="list" />
-                                <NeutralCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="list" />
+                                <NeutralCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
+                                <NeutralCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
                             </div>
 
                             {/* Row 2: Projects - Full width */}
-                            <NeutralCard icon="📁" title="Projects Built" items={userData.projects} type="list" size="full" />
+                            <NeutralCard icon="📁" title="Projects Built" items={userData.projects} type="text" size="full" />
 
                             {/* Row 3: Tech Stack */}
                             {userData.tools_learned?.length > 0 && (
@@ -386,12 +386,12 @@ const RecapPage = () => {
                     <div className="flex-1 flex flex-col gap-3">
                         {/* Row 1: Two cards side by side */}
                         <div className="grid grid-cols-2 gap-3">
-                            <HybridCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="list" />
-                            <HybridCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="list" />
+                            <HybridCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
+                            <HybridCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
                         </div>
 
                         {/* Row 2: Projects - Full width */}
-                        <HybridCard icon="📁" title="Projects Built" items={userData.projects} type="list" size="full" />
+                        <HybridCard icon="📁" title="Projects Built" items={userData.projects} type="text" size="full" />
 
                         {/* Row 3: Tech Stack - Full width */}
                         {userData.tools_learned?.length > 0 && (
