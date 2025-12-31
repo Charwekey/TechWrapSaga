@@ -38,11 +38,49 @@ const RecapPage = () => {
             });
 
             const fileName = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
-
-            // Try direct download first (works on most desktop browsers)
             const dataUrl = canvas.toDataURL('image/png');
 
-            // Create download link
+            // Check if we're on mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Try Web Share API with file (best for mobile)
+                try {
+                    const response = await fetch(dataUrl);
+                    const blob = await response.blob();
+                    const file = new File([blob], fileName, { type: 'image/png' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: 'My Tech Wrapped 2025'
+                        });
+                        return;
+                    }
+                } catch (shareErr) {
+                    console.log('Share with file failed:', shareErr);
+                }
+
+                // Fallback: Open image in new tab (user can long-press to save)
+                const newWindow = window.open();
+                if (newWindow) {
+                    newWindow.document.write(`
+                        <html>
+                        <head><title>Your Tech Wrapped 2025</title></head>
+                        <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#1a1a2e;">
+                            <div style="text-align:center; padding:20px;">
+                                <p style="color:white; font-family:sans-serif; margin-bottom:20px;">Long-press the image to save it 📱</p>
+                                <img src="${dataUrl}" style="max-width:100%; height:auto; border-radius:16px;" />
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                    return;
+                }
+            }
+
+            // Desktop: Direct download
             const link = document.createElement('a');
             link.href = dataUrl;
             link.download = fileName;
@@ -53,7 +91,7 @@ const RecapPage = () => {
 
         } catch (err) {
             console.error("Export failed:", err);
-            alert("Download failed. Try taking a screenshot instead!");
+            alert("Download failed. Please try taking a screenshot!");
         }
     };
 
@@ -173,18 +211,18 @@ const RecapPage = () => {
                             <p style={{ fontSize: '1rem', color: '#d81b60', fontWeight: '500' }}>{userData.title} | 2025</p>
                         </header>
 
-                        {/* Bento Box Layout */}
+                        {/* Bento Box Layout - Single column on mobile */}
                         <div className="flex-1 flex flex-col gap-3">
-                            {/* Row 1: Two cards side by side */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <GirlyCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
-                                <GirlyCard icon="💻" title="Projects Built" items={userData.projects} type="text" />
-                            </div>
+                            {/* Card 1: Tech Events Attended */}
+                            <GirlyCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
 
-                            {/* Row 2: Full width card */}
-                            <GirlyCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" size="full" />
+                            {/* Card 2: Projects Built */}
+                            <GirlyCard icon="💻" title="Projects Built" items={userData.projects} type="text" />
 
-                            {/* Row 3: Tech Stack - Full width gradient banner */}
+                            {/* Card 3: Tech Events Spoken At */}
+                            <GirlyCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
+
+                            {/* Card 4: Tech Stack Learned */}
                             {userData.tools_learned?.length > 0 && (
                                 <div style={{ background: 'linear-gradient(90deg, #f8bbd9 0%, #f48fb1 40%, #ff8a80 70%, #ffab91 100%)', borderRadius: '24px', padding: '16px 20px', boxShadow: '0 4px 20px rgba(244, 143, 177, 0.3)' }}>
                                     <div className="flex items-center gap-2 mb-2">
@@ -195,15 +233,11 @@ const RecapPage = () => {
                                 </div>
                             )}
 
-                            {/* Row 4: Two cards - Challenge and Overcome */}
-                            <div className="grid grid-cols-5 gap-3">
-                                <div className="col-span-2">
-                                    <GirlyCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
-                                </div>
-                                <div className="col-span-3">
-                                    <GirlyCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
-                                </div>
-                            </div>
+                            {/* Card 5: Biggest Challenge */}
+                            <GirlyCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
+
+                            {/* Card 6: How You Overcame It */}
+                            <GirlyCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
 
                             {/* Row 5: Goals - Full width */}
                             {userData.goals_2026?.length > 0 && (
@@ -261,18 +295,18 @@ const RecapPage = () => {
                             <p style={{ fontSize: '1rem', color: '#7b5a8c', fontWeight: '500' }}>{userData.title} | 2025</p>
                         </header>
 
-                        {/* Bento Box Layout */}
+                        {/* Bento Box Layout - Single column on mobile */}
                         <div className="flex-1 flex flex-col gap-3">
-                            {/* Row 1: Two cards side by side */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <NeutralCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
-                                <NeutralCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
-                            </div>
+                            {/* Card 1: Tech Events Attended */}
+                            <NeutralCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
 
-                            {/* Row 2: Projects - Full width */}
-                            <NeutralCard icon="📁" title="Projects Built" items={userData.projects} type="text" size="full" />
+                            {/* Card 2: Tech Events Spoken At */}
+                            <NeutralCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
 
-                            {/* Row 3: Tech Stack */}
+                            {/* Card 3: Projects Built */}
+                            <NeutralCard icon="📁" title="Projects Built" items={userData.projects} type="text" />
+
+                            {/* Card 4: Tech Stack */}
                             {userData.tools_learned?.length > 0 && (
                                 <div style={{ background: 'rgba(255, 255, 255, 0.75)', borderRadius: '24px', padding: '16px 20px', boxShadow: '0 4px 15px rgba(123, 90, 140, 0.1)', border: '1px solid rgba(200, 175, 210, 0.3)' }}>
                                     <div className="flex items-center gap-2 mb-2">
@@ -283,15 +317,11 @@ const RecapPage = () => {
                                 </div>
                             )}
 
-                            {/* Row 4: Asymmetric - Challenge (smaller) + Overcome (wider) */}
-                            <div className="grid grid-cols-5 gap-3">
-                                <div className="col-span-2">
-                                    <NeutralCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
-                                </div>
-                                <div className="col-span-3">
-                                    <NeutralCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
-                                </div>
-                            </div>
+                            {/* Card 5: Biggest Challenge */}
+                            <NeutralCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
+
+                            {/* Card 6: How You Overcame It */}
+                            <NeutralCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
 
                             {/* Row 5: Goals - Full width */}
                             {userData.goals_2026?.length > 0 && (
@@ -357,18 +387,18 @@ const RecapPage = () => {
                         <p style={{ fontSize: '1rem', color: '#9ca3af', fontWeight: '400', letterSpacing: '1px' }}>{userData.title} | 2025</p>
                     </header>
 
-                    {/* Bento Box Layout */}
+                    {/* Bento Box Layout - Single column on mobile */}
                     <div className="flex-1 flex flex-col gap-3">
-                        {/* Row 1: Two cards side by side */}
-                        <div className="grid grid-cols-2 gap-3">
-                            <HybridCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
-                            <HybridCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
-                        </div>
+                        {/* Card 1: Tech Events Attended */}
+                        <HybridCard icon="📅" title="Tech Events Attended" items={userData.events_attended} type="text" />
 
-                        {/* Row 2: Projects - Full width */}
-                        <HybridCard icon="📁" title="Projects Built" items={userData.projects} type="text" size="full" />
+                        {/* Card 2: Tech Events Spoken At */}
+                        <HybridCard icon="🎤" title="Tech Events Spoken At" items={userData.events_spoken_at} type="text" />
 
-                        {/* Row 3: Tech Stack - Full width */}
+                        {/* Card 3: Projects Built */}
+                        <HybridCard icon="📁" title="Projects Built" items={userData.projects} type="text" />
+
+                        {/* Card 4: Tech Stack */}
                         {userData.tools_learned?.length > 0 && (
                             <div style={{ background: 'rgba(55, 65, 85, 0.6)', backdropFilter: 'blur(10px)', borderRadius: '20px', padding: '16px 20px', border: '1px solid rgba(107, 114, 128, 0.3)' }}>
                                 <div className="flex items-center gap-2 mb-2">
@@ -379,15 +409,11 @@ const RecapPage = () => {
                             </div>
                         )}
 
-                        {/* Row 4: Asymmetric - Challenge (smaller) + Overcome (wider) */}
-                        <div className="grid grid-cols-5 gap-3">
-                            <div className="col-span-3">
-                                <HybridCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" variant="light" />
-                            </div>
-                            <div className="col-span-3">
-                                <HybridCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" variant="light" />
-                            </div>
-                        </div>
+                        {/* Card 5: Biggest Challenge */}
+                        <HybridCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" variant="light" />
+
+                        {/* Card 6: How You Overcame It */}
+                        <HybridCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" variant="light" />
 
                         {/* Row 5: Goals - Full width */}
                         {userData.goals_2026?.length > 0 && (
