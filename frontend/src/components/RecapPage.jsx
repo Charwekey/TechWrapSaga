@@ -31,23 +31,98 @@ const RecapPage = () => {
                     scale: 2,
                     useCORS: true,
                     backgroundColor: null,
+                    allowTaint: true,
+                    logging: false
                 });
-                const link = document.createElement('a');
-                link.download = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+
+                // Convert to blob for better mobile support
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        alert("Failed to generate image. Please try again.");
+                        return;
+                    }
+
+                    const fileName = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
+
+                    // Check if Web Share API is available (mobile)
+                    if (navigator.share && navigator.canShare) {
+                        try {
+                            const file = new File([blob], fileName, { type: 'image/png' });
+                            if (navigator.canShare({ files: [file] })) {
+                                await navigator.share({
+                                    files: [file],
+                                    title: 'My Tech Wrapped 2025',
+                                    text: 'Check out my Tech Wrapped 2025!'
+                                });
+                                return;
+                            }
+                        } catch (shareErr) {
+                            console.log('Share failed, falling back to download:', shareErr);
+                        }
+                    }
+
+                    // Fallback: Create download link
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+
+                    // For iOS Safari compatibility
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Cleanup
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                }, 'image/png', 1.0);
             } catch (err) {
                 console.error("Export failed", err);
-                alert("Failed to generate image. Please try again.");
+                alert("Failed to generate image. Please try again on a computer for best results.");
             }
         }
     };
 
-    const handleShare = () => {
+    const handleShare = async () => {
         const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
+
+        // Try Web Share API first (native mobile sharing)
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'My Tech Wrapped 2025',
+                    text: 'Check out my Tech Wrapped 2025!',
+                    url: url
+                });
+                return;
+            } catch (err) {
+                // User cancelled or share failed, fall through to clipboard
+                if (err.name !== 'AbortError') {
+                    console.log('Share failed:', err);
+                }
+            }
+        }
+
+        // Fallback: Copy to clipboard
+        try {
+            await navigator.clipboard.writeText(url);
             alert("Link copied to clipboard!");
-        });
+        } catch (err) {
+            // Final fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("Link copied to clipboard!");
+            } catch (e) {
+                alert("Please copy this link: " + url);
+            }
+            document.body.removeChild(textArea);
+        }
     };
 
     if (loading) {
