@@ -25,60 +25,35 @@ const RecapPage = () => {
     }, [id]);
 
     const handleDownload = async () => {
-        if (recapRef.current) {
-            try {
-                const canvas = await html2canvas(recapRef.current, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: null,
-                    allowTaint: true,
-                    logging: false
-                });
+        if (!recapRef.current) return;
 
-                // Convert to blob for better mobile support
-                canvas.toBlob(async (blob) => {
-                    if (!blob) {
-                        alert("Failed to generate image. Please try again.");
-                        return;
-                    }
+        try {
+            // Generate canvas
+            const canvas = await html2canvas(recapRef.current, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null,
+                allowTaint: false,
+                logging: false
+            });
 
-                    const fileName = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
+            const fileName = `tech-wrapped-2025-${userData?.name || 'recap'}.png`;
 
-                    // Check if Web Share API is available (mobile)
-                    if (navigator.share && navigator.canShare) {
-                        try {
-                            const file = new File([blob], fileName, { type: 'image/png' });
-                            if (navigator.canShare({ files: [file] })) {
-                                await navigator.share({
-                                    files: [file],
-                                    title: 'My Tech Wrapped 2025',
-                                    text: 'Check out my Tech Wrapped 2025!'
-                                });
-                                return;
-                            }
-                        } catch (shareErr) {
-                            console.log('Share failed, falling back to download:', shareErr);
-                        }
-                    }
+            // Try direct download first (works on most desktop browsers)
+            const dataUrl = canvas.toDataURL('image/png');
 
-                    // Fallback: Create download link
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = fileName;
+            // Create download link
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-                    // For iOS Safari compatibility
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    // Cleanup
-                    setTimeout(() => URL.revokeObjectURL(url), 100);
-                }, 'image/png', 1.0);
-            } catch (err) {
-                console.error("Export failed", err);
-                alert("Failed to generate image. Please try again on a computer for best results.");
-            }
+        } catch (err) {
+            console.error("Export failed:", err);
+            alert("Download failed. Try taking a screenshot instead!");
         }
     };
 
@@ -406,7 +381,7 @@ const RecapPage = () => {
 
                         {/* Row 4: Asymmetric - Challenge (smaller) + Overcome (wider) */}
                         <div className="grid grid-cols-5 gap-3">
-                            <div className="col-span-2">
+                            <div className="col-span-3">
                                 <HybridCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" variant="light" />
                             </div>
                             <div className="col-span-3">
@@ -438,10 +413,17 @@ const RecapPage = () => {
     );
 };
 
-// Girly Card Component
+// Girly Card Component - handles both arrays and strings
 const GirlyCard = ({ icon, title, items, content, type, size }) => {
+    // Handle arrays passed to type='text'
+    let displayContent = content;
+    if (type === 'text' && Array.isArray(items)) {
+        displayContent = items.filter(Boolean).join(', ');
+    }
+
+    // Check if we have content to display
     if (type === 'list' && (!items || items.length === 0)) return null;
-    if (type === 'text' && (!content || !content.trim())) return null;
+    if (type === 'text' && (!displayContent || (typeof displayContent === 'string' && !displayContent.trim()))) return null;
 
     return (
         <div style={{
@@ -466,16 +448,23 @@ const GirlyCard = ({ icon, title, items, content, type, size }) => {
                     ))}
                 </ul>
             ) : (
-                <p style={{ fontSize: '0.8rem', color: '#6d4c5e', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{content}</p>
+                <p style={{ fontSize: '0.8rem', color: '#6d4c5e', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{displayContent}</p>
             )}
         </div>
     );
 };
 
-// Neutral Card Component
+// Neutral Card Component - handles both arrays and strings
 const NeutralCard = ({ icon, title, items, content, type, size }) => {
+    // Handle arrays passed to type='text'
+    let displayContent = content;
+    if (type === 'text' && Array.isArray(items)) {
+        displayContent = items.filter(Boolean).join(', ');
+    }
+
+    // Check if we have content to display
     if (type === 'list' && (!items || items.length === 0)) return null;
-    if (type === 'text' && (!content || !content.trim())) return null;
+    if (type === 'text' && (!displayContent || (typeof displayContent === 'string' && !displayContent.trim()))) return null;
 
     return (
         <div style={{
@@ -500,16 +489,23 @@ const NeutralCard = ({ icon, title, items, content, type, size }) => {
                     ))}
                 </ul>
             ) : (
-                <p style={{ fontSize: '0.8rem', color: '#5a4066', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{content}</p>
+                <p style={{ fontSize: '0.8rem', color: '#5a4066', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{displayContent}</p>
             )}
         </div>
     );
 };
 
-// Hybrid Card Component
+// Hybrid Card Component - handles both arrays and strings
 const HybridCard = ({ icon, title, items, content, type, size, variant }) => {
+    // Handle arrays passed to type='text'
+    let displayContent = content;
+    if (type === 'text' && Array.isArray(items)) {
+        displayContent = items.filter(Boolean).join(', ');
+    }
+
+    // Check if we have content to display
     if (type === 'list' && (!items || items.length === 0)) return null;
-    if (type === 'text' && (!content || !content.trim())) return null;
+    if (type === 'text' && (!displayContent || (typeof displayContent === 'string' && !displayContent.trim()))) return null;
 
     const isLight = variant === 'light';
 
@@ -536,7 +532,7 @@ const HybridCard = ({ icon, title, items, content, type, size, variant }) => {
                     ))}
                 </ul>
             ) : (
-                <p style={{ fontSize: '0.8rem', color: isLight ? '#4b5563' : '#d1d5db', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{content}</p>
+                <p style={{ fontSize: '0.8rem', color: isLight ? '#4b5563' : '#d1d5db', lineHeight: '1.4', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{displayContent}</p>
             )}
         </div>
     );
