@@ -13,7 +13,7 @@ const RecapPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/wraps/${id}`);
+                const res = await axios.get(`https://accomplished-unity-production.up.railway.app/api/wraps/${id}`);
                 setUserData(res.data);
             } catch (err) {
                 console.error(err);

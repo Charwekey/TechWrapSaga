@@ -18,8 +18,8 @@ const AuthModal = ({ onClose, onSuccess }) => {
         setError('');
 
         const url = isLogin
-            ? 'http://localhost:5000/api/auth/login'
-            : 'http://localhost:5000/api/auth/signup';
+            ? 'https://accomplished-unity-production.up.railway.app/api/auth/login'
+            : 'https://accomplished-unity-production.up.railway.app/api/auth/signup';
 
         const payload = isLogin
             ? { email: formData.email, password: formData.password }
