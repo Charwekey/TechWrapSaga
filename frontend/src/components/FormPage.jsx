@@ -60,6 +60,14 @@ const FormPage = () => {
             navigate(`/recap/${res.data.id}`);
         } catch (error) {
             console.error(error);
+            // Handle token expiration/invalid token
+            if (error.response?.status === 400 || error.response?.status === 401) {
+                localStorage.removeItem('auth-token');
+                localStorage.removeItem('user');
+                alert('Your session has expired. Please log in again.');
+                navigate('/');
+                return;
+            }
             alert('Error submitting form: ' + (error.response?.data || error.message));
         } finally {
             setLoading(false);
@@ -83,6 +91,9 @@ const FormPage = () => {
                     </h1>
                     <p className="text-lg text-gray-400 max-w-xl mx-auto">
                         Document your journey, showcase your growth
+                    </p>
+                    <p className="text-sm text-amber-400/80 mt-2">
+                        ✨ Kindly keep answers brief for the best recap experience
                     </p>
                 </header>
 
@@ -142,7 +153,7 @@ const FormPage = () => {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <InputGroup
-                                        label="Events Attended"
+                                        label="Tech Events Attended"
                                         name="events_attended"
                                         value={formData.events_attended}
                                         onChange={handleChange}
@@ -150,7 +161,7 @@ const FormPage = () => {
                                         placeholder="React Conf, Local Meetups"
                                     />
                                     <InputGroup
-                                        label="Events Spoken At"
+                                        label="Tech Events Spoken At"
                                         name="events_spoken_at"
                                         value={formData.events_spoken_at}
                                         onChange={handleChange}
