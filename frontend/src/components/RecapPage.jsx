@@ -261,10 +261,10 @@ const RecapPage = () => {
                             )}
 
                             {/* Card 5: Biggest Challenge */}
-                            <GirlyCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
+                            <GirlyCard icon="⚡" title="Biggest Challenge" items={userData.challenges} type="text" />
 
                             {/* Card 6: How You Overcame It */}
-                            <GirlyCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
+                            <GirlyCard icon="💪" title="How You Overcame It" items={userData.overcome_challenges} type="text" />
 
                             {/* Row 5: Goals - Full width */}
                             {userData.goals_2026?.length > 0 && (
@@ -345,10 +345,10 @@ const RecapPage = () => {
                             )}
 
                             {/* Card 5: Biggest Challenge */}
-                            <NeutralCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" />
+                            <NeutralCard icon="⚡" title="Biggest Challenge" items={userData.challenges} type="text" />
 
                             {/* Card 6: How You Overcame It */}
-                            <NeutralCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" />
+                            <NeutralCard icon="💪" title="How You Overcame It" items={userData.overcome_challenges} type="text" />
 
                             {/* Row 5: Goals - Full width */}
                             {userData.goals_2026?.length > 0 && (
@@ -437,19 +437,19 @@ const RecapPage = () => {
                         )}
 
                         {/* Card 5: Biggest Challenge */}
-                        <HybridCard icon="⚡" title="Biggest Challenge" content={userData.challenges?.[0]} type="text" variant="light" />
+                        <HybridCard icon="⚡" title="Biggest Challenge" items={userData.challenges} type="text" />
 
                         {/* Card 6: How You Overcame It */}
-                        <HybridCard icon="💪" title="How You Overcame It" content={userData.overcome_challenges?.[0]} type="text" variant="light" />
+                        <HybridCard icon="💪" title="How You Overcame It" items={userData.overcome_challenges} type="text" />
 
                         {/* Row 5: Goals - Full width */}
                         {userData.goals_2026?.length > 0 && (
-                            <div style={{ background: 'rgba(245, 245, 245, 0.9)', borderRadius: '20px', padding: '16px', border: '1px solid rgba(209, 213, 219, 0.3)' }}>
+                            <div style={{ background: 'rgba(55, 65, 85, 0.6)', backdropFilter: 'blur(10px)', borderRadius: '20px', padding: '16px 20px', border: '1px solid rgba(107, 114, 128, 0.3)' }}>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span style={{ fontSize: '14px' }}>🚀</span>
-                                    <h3 style={{ fontSize: '0.95rem', color: '#374151', fontWeight: '600' }}>Goals for 2026</h3>
+                                    <h3 style={{ fontSize: '0.95rem', color: '#e5e7eb', fontWeight: '600' }}>Goals for 2026</h3>
                                 </div>
-                                <p style={{ fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.5', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{userData.goals_2026.join(', ')}</p>
+                                <p style={{ fontSize: '0.85rem', color: '#d1d5db', lineHeight: '1.5', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{userData.goals_2026.join(', ')}</p>
                             </div>
                         )}
                     </div>
