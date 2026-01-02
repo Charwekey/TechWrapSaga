@@ -426,13 +426,13 @@ const RecapPage = () => {
                         <HybridCard icon="📁" title="Projects Built" items={userData.projects} type="text" />
 
                         {/* Card 4: Tech Stack */}
-                        {userData.tools_learnt?.length > 0 && (
+                        {userData.tools_learned?.length > 0 && (
                             <div style={{ background: 'rgba(55, 65, 85, 0.6)', backdropFilter: 'blur(10px)', borderRadius: '20px', padding: '16px 20px', border: '1px solid rgba(107, 114, 128, 0.3)' }}>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span style={{ fontSize: '16px' }}>🧰</span>
                                     <h3 style={{ fontSize: '1rem', color: '#e5e7eb', fontWeight: '600' }}>Tech Stack / Tools Learnt</h3>
                                 </div>
-                                <p style={{ color: '#d1d5db', fontSize: '0.85rem', lineHeight: '1.5', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{userData.tools_learnt.join(', ')}</p>
+                                <p style={{ color: '#d1d5db', fontSize: '0.85rem', lineHeight: '1.5', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{userData.tools_learned.join(', ')}</p>
                             </div>
                         )}
 

@@ -149,8 +149,8 @@ const FormPage = () => {
                                     />
                                     <InputGroup
                                         label="Tech Stack / Tools Learnt"
-                                        name="tools_learnt"
-                                        value={formData.tools_learnt}
+                                        name="tools_learned"
+                                        value={formData.tools_learned}
                                         onChange={handleChange}
                                         type="textarea"
                                         placeholder="Next.js 14, Docker, Rust, Framer Motion"
