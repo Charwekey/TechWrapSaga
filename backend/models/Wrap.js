@@ -25,8 +25,7 @@ const Wrap = sequelize.define('Wrap', {
     },
     tools_learned: {
         type: DataTypes.ARRAY(DataTypes.STRING),
-        defaultValue: [],
-        field: 'tools_learnt' // Maps to actual database column name
+        defaultValue: []
     },
     events_attended: {
         type: DataTypes.ARRAY(DataTypes.STRING),
