@@ -143,9 +143,9 @@ const FormPage = () => {
                                         placeholder="AI Chatbot, Portfolio V2, E-commerce Store"
                                     />
                                     <InputGroup
-                                        label="Tech Stack Learned"
-                                        name="tools_learned"
-                                        value={formData.tools_learned}
+                                        label="Tech Stack / Tools Learnt"
+                                        name="tools_learnt"
+                                        value={formData.tools_learnt}
                                         onChange={handleChange}
                                         type="textarea"
                                         placeholder="Next.js 14, Docker, Rust, Framer Motion"
