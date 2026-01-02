@@ -59,12 +59,17 @@ const FormPage = () => {
 
             navigate(`/recap/${res.data.id}`);
         } catch (error) {
-            console.error(error);
+            console.error('Wrap submission error:', error);
+            console.log('Response status:', error.response?.status);
+            console.log('Response data:', error.response?.data);
+            console.log('Token used:', localStorage.getItem('auth-token')?.substring(0, 20) + '...');
+
             // Handle token expiration/invalid token
             if (error.response?.status === 400 || error.response?.status === 401) {
+                const errorMsg = error.response?.data || 'Unknown error';
+                alert(`Authentication error: ${errorMsg}\n\nPlease check the browser console (F12) for more details.`);
                 localStorage.removeItem('auth-token');
                 localStorage.removeItem('user');
-                alert('Your session has expired. Please log in again.');
                 navigate('/');
                 return;
             }
